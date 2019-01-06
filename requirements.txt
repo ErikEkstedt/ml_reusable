@@ -1,0 +1,9 @@
+torch 
+torchvision 
+matplotlib 
+numpy 
+tqdm
+gym
+tensorflow
+tensorboardx
+librosa
