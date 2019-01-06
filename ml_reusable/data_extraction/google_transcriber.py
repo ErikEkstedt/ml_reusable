@@ -13,9 +13,9 @@ class GoogleTranscriber(object):
         self.credentials = self._credentials()
         self.sample_rate = sample_rate
         if lang.lower() == 'swe':
-            self.lang = 'sv-SE'
+            self.language = 'sv-SE'
         else:
-            self.lang = 'en-US'
+            self.language = 'en-US'
         self.config = self._config()
         self.client = self._client()
 
@@ -65,10 +65,20 @@ class GoogleTranscriber(object):
         self.response = response  # store entire response from google
         return transcripts
 
-    def save_transcript(self, filepath, transcripts):
+    def save_transcript(self, filepath, transcripts, verbose=True):
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(transcripts, f)
-        print(f'Saved transcript to: {filepath}')
+        if verbose: print(f'Saved transcript to: {filepath}')
+
+
+def transcribe_and_save(source, target, credential_path,
+        sample_rate=16000, lang='swe'):
+    transcriber = GoogleTranscriber(
+            credential_path=credential_path,
+            sample_rate=sample_rate, 
+            lang=lang)
+    transcripts = transcriber(source)
+    transcriber.save_transcript(target, transcripts, verbose=False)
 
 
 if __name__ == "__main__":
