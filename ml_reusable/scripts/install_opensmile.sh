@@ -45,7 +45,7 @@ echo "Config path gemaps 10ms: $CONF10"
 
 echo
 echo "Example:"
-echo "/$OpensmileBIN - C $CONF50 -l 0 -I /path/to/wav -D /path/to/output"
+echo "/$OpensmileBIN -C $CONF50 -l 0 -I /path/to/wav -D /path/to/output"
 echo
 echo "For python use see:"
 echo "https://github.com/ErikEkstedt/ml_reusable/blob/master/ml_reusable/data_extraction/gemaps.py"
