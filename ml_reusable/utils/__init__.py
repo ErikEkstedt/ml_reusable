@@ -1,4 +1,27 @@
 import torch
+import json
+import csv
+
+
+def read_json(path):
+    with open(path, 'r') as jsonfile:
+        dialogue = json.loads(jsonfile.read())
+    return dialogue
+
+
+def write_json(dialogue, filename):
+    with open(filename, 'w', encoding='utf-8') as jsonfile:
+        dialogue = json.dump(dialogue, jsonfile)
+    return dialogue
+
+
+def read_csv(path):
+    data = []
+    with open(path, 'r') as f:
+        csvReader = csv.reader(f)
+        for row in csvReader:
+            data.append(row)
+    return data 
 
 
 def total_number_of_parameters(model):
