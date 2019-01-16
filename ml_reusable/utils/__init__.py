@@ -1,6 +1,20 @@
 import torch
-import json
-import csv
+import json 
+import csv 
+
+
+def read_csv(path):
+    data = []
+    with open(path, 'r') as f:
+        csv_reader = csv.reader(f)
+        for row in csv_reader:
+            data.append(row)
+    return data
+
+
+def read_json(path):
+    with open(path, 'r') as f:
+        dialogue = json.loads(f.read())
 
 
 def read_json(path):
@@ -41,6 +55,8 @@ def num2onehot(label, classes=10):
         onehot[i, idx] = 1
     return onehot
 
+
+#------------ CNN Output shapes ---------------
 
 def conv_output_shape(h_w, out_channels=1, kernel_size=3, stride=1, padding=0, dilation=1):
     """
@@ -86,3 +102,12 @@ def deconv_output_shape(h_w, out_channels=1, kernel_size=3, stride=1,
     w = int((h_w[1]-1) * stride[1] - (2 * padding[1]) + \
                 kernel_size[1] + output_padding[1] )
     return out_channels, h, w
+
+
+#------------ RNN Output shapes ---------------
+def rnn_output_shape(rnn, seq_len):
+    rnn_out = rnn.hidden_size * seq_len 
+    if rnn.bidirectional:
+        rnn_out *= 2
+    return rnn_out
+
