@@ -20,7 +20,7 @@ import csv
 import matplotlib.pyplot as plt
 
 
-INDEX2GEMAPS = { 
+INDEX2GEMAPS = {
         0:'Loudness',
         1:'alphaRatio',
         2:'hammarbergIndex',
@@ -92,7 +92,7 @@ def extract_gemaps_from_wav(
         wavpath,
         filepath='gemaps.csv',
         frame_length=10,
-        opensmile = 'opensmile/opensmile-2.3.0',
+        opensmile='opensmile/opensmile-2.3.0',
         verbose=True):
     '''
     Arguments:
@@ -100,7 +100,7 @@ def extract_gemaps_from_wav(
         filepath:       filepath to output gemaps (.csv) file
         frame_length:   int, length of frames in milliseconds
         opensmile:      path to opensmile-2.3.0
-        verbose:        Boolean, True if display success print 
+        verbose:        Boolean, True if display success print
     '''
 
     BIN_PATH = join(opensmile, 'bin/linux_x64_standalone_static/SMILExtract')
@@ -108,19 +108,19 @@ def extract_gemaps_from_wav(
     CONF_10 = join(opensmile, 'config/gemaps_10ms/eGeMAPSv01a.conf')
 
     if frame_length == 10:
-        opensmile_cmd = BIN_PATH + ' -C '+ CONF_10 + ' -l 0'
+        opensmile_cmd = BIN_PATH + ' -C ' + CONF_10 + ' -l 0'
     elif frame_length == 50:
-        opensmile_cmd = BIN_PATH + ' -C '+ CONF_50 + ' -l 0'
+        opensmile_cmd = BIN_PATH + ' -C ' + CONF_50 + ' -l 0'
     else:
         print('No configuration file for frame length != 50, 10 ms')
         exit(0)
 
     # Check if output filepath already exists
-    if exists(filepath):
-        print(f'Filepath: {filepath} already exists!')
-        ans = input('Do you wish to overwrite? (Y/N)\n> ')
-        if not ans.lower() == 'y':
-            exit(0)
+    # if exists(filepath):
+    #     print(f'Filepath: {filepath} already exists!')
+    #     ans = input('Do you wish to overwrite? (Y/N)\n> ')
+    #     if not ans.lower() == 'y':
+    #         exit(0)
 
     # Create folder if neccessary
     output_directory, fname = split(filepath)
