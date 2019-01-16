@@ -1,6 +1,4 @@
-import os
 import json
-from os.path import join
 
 from google.cloud import speech
 from google.cloud.speech import enums, types
@@ -8,7 +6,7 @@ from google.oauth2.service_account import Credentials
 
 
 class GoogleTranscriber(object):
-    def __init__(self, credential_path, sample_rate=16000, lang='swe'): 
+    def __init__(self, credential_path, sample_rate=16000, lang='swe'):
         self.credential_path = credential_path
         self.credentials = self._credentials()
         self.sample_rate = sample_rate
@@ -75,7 +73,7 @@ def transcribe_and_save(source, target, credential_path,
         sample_rate=16000, lang='swe'):
     transcriber = GoogleTranscriber(
             credential_path=credential_path,
-            sample_rate=sample_rate, 
+            sample_rate=sample_rate,
             lang=lang)
     transcripts = transcriber(source)
     transcriber.save_transcript(target, transcripts, verbose=False)
@@ -95,10 +93,10 @@ if __name__ == "__main__":
     parser.add_argument('--sample_rate', type=int, default=16000,
             help='sample rate of audio (default: 16000)')
     args = parser.parse_args()
-    
+
     transcriber = GoogleTranscriber(
             credentials=args.credential,
-            sample_rate=args.sample_rate, 
+            sample_rate=args.sample_rate,
             lang=args.language)
     transcripts = transcriber(args.source)
     transcriber.save_transcript(args.target, transcripts)

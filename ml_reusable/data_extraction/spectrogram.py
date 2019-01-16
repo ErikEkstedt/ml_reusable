@@ -1,4 +1,4 @@
-from os.path import join, split
+from os.path import join
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa
@@ -17,15 +17,55 @@ def plot_melspectrogram(spec):
     plt.show()
 
 
-def wav2MelSpectrogram(wav_path, frame_duration=10, n_mels=128, fmax=8000):
+def mel_spectrogram(
+        y, sr, n_fft, hop_length,
+        n_mels=128, fmin=0, fmax=8000, power=2, center=False):
+    '''
+    center=False breaks down for some audio:
+        "librosa.util.exceptions.ParameterError: 
+            Buffer is too short (n=480) for frame_length=800"
+
+    Custom mel_spectrogram based on librosa with the ability to use the center
+    variable. The amount of frames differs based on center is true/false.
+    '''
+
+    if len(y) < n_fft and not center:
+        # With center=False smaller sounds than frame size is not handled
+        # correctly
+        y_ = np.zeros(n_fft)
+        y_[:len(y)] = y
+        y = y_
+
+    # from _spectrogram
+    S = np.abs(librosa.stft(
+        y, n_fft=n_fft, hop_length=hop_length, center=center))**power
+    # Build a Mel filter
+    # mel_basis = librosa.filters.mel(sr, n_fft, n_mels, fmin, fmax)
+    # return np.dot(mel_basis, S)
+
+    mel = librosa.feature.melspectrogram(
+            S=S, n_fft=n_fft, hop_length=hop_length, power=power)
+    return mel
+
+
+def wav2MelSpectrogram(
+        wav_path, frame_duration=10, n_mels=128, fmax=8000, default=False):
     ''' extract melspectrogram with fft-frame=hop_length=frame_ms '''
+
     frame_duration = frame_duration * 1e-3
     y, sr = librosa.core.load(wav_path, sr=None)
-    
+
     # MelSpectrogram
     frame = librosa.core.time_to_samples(frame_duration, sr)
-    spectrogram = librosa.feature.melspectrogram(y, sr=sr, n_fft=frame,
-            hop_length=frame, fmax=fmax, n_mels=n_mels).astype(np.float32).T
+    if default:
+        spectrogram = librosa.feature.melspectrogram(
+                y, sr=sr, n_fft=frame, hop_length=frame,
+                fmax=fmax, n_mels=n_mels).astype(np.float32).T
+    else:
+        spectrogram = mel_spectrogram(
+                y, sr=sr, n_fft=frame, hop_length=frame,
+                fmax=fmax, n_mels=n_mels).astype(np.float32).T
+
     return spectrogram
 
 
@@ -44,7 +84,8 @@ def test_spectrogram():
     mel = np.load('test.npy')
     plot_melspectrogram(mel.T)
 
-#----------- MFCC Features -----------
+
+# ----------- MFCC Features -----------
 
 def extract_mfcc(wavpath, n_mfcc=40, dct_type=2):
     ''' MFCC
