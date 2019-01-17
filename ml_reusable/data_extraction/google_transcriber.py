@@ -64,8 +64,8 @@ class GoogleTranscriber(object):
         return transcripts
 
     def save_transcript(self, filepath, transcripts, verbose=True):
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(transcripts, f)
+        with open(filepath, 'w') as f:
+            json.dump(transcripts, f, ensure_ascii=False)
         if verbose: print(f'Saved transcript to: {filepath}')
 
 

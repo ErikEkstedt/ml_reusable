@@ -25,7 +25,7 @@ def read_json(path):
 
 def write_json(dialogue, filename):
     with open(filename, 'w', encoding='utf-8') as jsonfile:
-        dialogue = json.dump(dialogue, jsonfile)
+        dialogue = json.dump(dialogue, jsonfile, ensure_ascii=False)
     return dialogue
 
 
