@@ -6,18 +6,29 @@ from functools import reduce
 from ml_reusable.utils import conv_output_shape
 
 
-def mlp_block(in_f, out_f, *args, **kwargs):
-    return nn.Sequential(
-            nn.Linear(in_f, out_f, *args, **kwargs),
-            nn.BatchNorm1d(out_f),
-            nn.ReLU())
+def mlp_block(in_f, out_f, batchnorm=True, *args, **kwargs):
+    if batchnorm:
+        return nn.Sequential(
+                nn.Linear(in_f, out_f, *args, **kwargs),
+                nn.BatchNorm1d(out_f),
+                nn.ReLU())
+    else:
+        return nn.Sequential(
+                nn.Linear(in_f, out_f, *args, **kwargs),
+                nn.ReLU())
 
 
-def conv_block(in_channels, out_channels, *args, **kwargs):
-    return nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, *args, **kwargs),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU())
+def conv_block(in_channels, out_channels, batchnorm=True, *args, **kwargs):
+    if batchnorm:
+        return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, *args, **kwargs),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU())
+    else:
+        return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, *args, **kwargs),
+                nn.ReLU())
+
 
 def deconv_block(in_channels, out_channels, *args, **kwargs):
     return nn.Sequential(
@@ -53,5 +64,3 @@ class FrameWiseDimReduction(nn.Module):
         z = self.fc(x)
         out = z.reshape(N, 1, F, self.out_size)
         return self.out_activation(out)
-
-
