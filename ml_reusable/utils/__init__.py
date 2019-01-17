@@ -1,6 +1,9 @@
 import torch
 import json 
 import csv 
+from datetime import datetime
+from os import makedirs
+from os.path import join
 
 
 def read_csv(path):
@@ -111,3 +114,29 @@ def rnn_output_shape(rnn, seq_len):
         rnn_out *= 2
     return rnn_out
 
+
+#------------ Checkpoint save/load ------------
+def save_checkpoint(model, optimizer, epoch, loss, path=None):
+    if not path:
+        d = datetime.now()
+        dirpath = 'checkpoints'
+        makedirs(dirpath, exist_ok=True)
+        path = 'checkpoint_'
+        path += '-'.join([str(d.date()), str(d.hour), str(d.minute), str(d.second)])
+        path += '.pt'
+        path = join(dirpath, path)
+
+    torch.save({'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'loss': loss,}, path)
+    return path
+
+
+def load_checkpoint(model, optimizer, path=None):
+    checkpoint = torch.load(path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    epoch = checkpoint['epoch']
+    loss = checkpoint['loss']
+    return model, optimizer, epoch, loss
