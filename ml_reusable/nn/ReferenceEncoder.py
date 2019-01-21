@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+from functools import reduce
+
+from ml_reusable.utils import conv_output_shape
+from ml_reusable.nn.modules import conv_block
 
 
 class ReferenceEncoder(nn.Module):
@@ -11,8 +14,8 @@ class ReferenceEncoder(nn.Module):
           Control and Transfer in End-to-End Speech Synthesis.
           https://arxiv.org/pdf/1803.09017.pdf
 
-        * First used in: 
-          Towards End-to-End Prosody Transfer for Expressive 
+        * First used in:
+          Towards End-to-End Prosody Transfer for Expressive
           Speech Synthesis with Tacotron
           https://arxiv.org/pdf/1803.09047.pdf
 
@@ -39,12 +42,13 @@ class ReferenceEncoder(nn.Module):
     '''
 
     def __init__(self, hidden=[32, 32, 64, 64, 128, 128],
-            kernel=(3,3), stride=[2,2,2,1,1,1]):
+            kernel=(3,3), stride=[2,2,2,1,1,1], rnn_hidden=256):
         super().__init__()
         self.padding = (kernel[0] // 2, kernel[1] // 2)
         self.kernel = kernel
         self.stride = stride
         self.hidden = hidden
+        self.rnn_hidden = rnn_hidden
 
         filters = [1] + hidden  # input channels=1 for spectrogram
         convs = [conv_block(
@@ -55,12 +59,14 @@ class ReferenceEncoder(nn.Module):
             padding=self.padding) for i in range(len(hidden))]
         self.convs = nn.Sequential(*convs)
 
-        # TODO
-        # self.gru = nn.GRU(input_size=hp.ref_enc_filters[-1] * out_channels,
-        #                   hidden_size=hp.E // 2,
-        #                   batch_first=True)
+        self.conv_out = self._conv_shape()[-1]
+        h_w_flatten = self.conv_out[1] * self.conv_out[2]
 
-    def _shape(self, h_w=(1,70,128)):
+        self.rnn = nn.GRU(input_size=h_w_flatten,
+                          hidden_size=rnn_hidden,
+                          batch_first=True)
+
+    def _conv_shape(self, h_w=(1,70,128)):
         ''' Returns a list of shapes based on `h_w` (C, H, W) input.'''
         shapes = []
         shapes.append(h_w)
@@ -69,27 +75,31 @@ class ReferenceEncoder(nn.Module):
                 if isinstance(v, nn.Conv2d):
                     h_w = conv_output_shape(
                             h_w[1:],
-                            out_channels=v.out_channels, 
+                            out_channels=v.out_channels,
                             kernel_size=v.kernel_size,
                             stride=v.stride,
                             padding=v.padding)
                     shapes.append(h_w)
         return shapes
 
-    def total_out_features(self, h_w=(1, 30, 128)):
-        return reduce( (lambda x, y: x * y), self._shape(h_w)[-1])
+    def total_conv_out_features(self, h_w=(1, 30, 128)):
+        return reduce((lambda x, y: x * y), self._conv_shape(h_w)[-1])
 
     def forward(self, x):
-        return self.convs(x)
+        z = self.convs(x)
+        z = z.flatten(2)
+        o, h = self.rnn(z)
+        return o, h
 
 
 if __name__ == "__main__":
 
     refenc = ReferenceEncoder()
-    [print(s) for s in refenc._shape()]
+
+    [print(s) for s in refenc._conv_shape()]
 
     N = 5
     x = torch.ones((N, 1, 70, 128))
-    out = refenc(x)
-    out.shape
+    o, h = refenc(x)
+    o.shape
 

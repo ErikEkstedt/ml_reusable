@@ -91,7 +91,7 @@ def plot_gemaps(gemaps):
 def extract_gemaps_from_wav(
         wavpath,
         filepath='gemaps.csv',
-        frame_length=10,
+        frame_length=50,
         opensmile='opensmile/opensmile-2.3.0',
         verbose=True):
     '''
@@ -114,13 +114,6 @@ def extract_gemaps_from_wav(
     else:
         print('No configuration file for frame length != 50, 10 ms')
         exit(0)
-
-    # Check if output filepath already exists
-    # if exists(filepath):
-    #     print(f'Filepath: {filepath} already exists!')
-    #     ans = input('Do you wish to overwrite? (Y/N)\n> ')
-    #     if not ans.lower() == 'y':
-    #         exit(0)
 
     # Create folder if neccessary
     output_directory, fname = split(filepath)
