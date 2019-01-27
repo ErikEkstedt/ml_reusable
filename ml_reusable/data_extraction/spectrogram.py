@@ -29,12 +29,12 @@ def mel_spectrogram(
     variable. The amount of frames differs based on center is true/false.
     '''
 
-    if len(y) < n_fft and not center:
-        # With center=False smaller sounds than frame size is not handled
-        # correctly
-        y_ = np.zeros(n_fft)
-        y_[:len(y)] = y
-        y = y_
+    # if len(y) < n_fft and not center:
+    #     # With center=False smaller sounds than frame size is not handled
+    #     # correctly
+    #     y_ = np.zeros(n_fft)
+    #     y_[:len(y)] = y
+    #     y = y_
 
     # from _spectrogram
     S = np.abs(librosa.stft(
@@ -49,7 +49,7 @@ def mel_spectrogram(
 
 
 def wav2MelSpectrogram(
-        wav_path, frame_duration=10, n_mels=128, fmax=8000, default=False):
+        wav_path, frame_duration=50, n_mels=128, fmax=8000, default=False):
     ''' extract melspectrogram with fft-frame=hop_length=frame_ms '''
 
     frame_duration = frame_duration * 1e-3
@@ -62,14 +62,18 @@ def wav2MelSpectrogram(
                 y, sr=sr, n_fft=frame, hop_length=frame,
                 fmax=fmax, n_mels=n_mels).astype(np.float32).T
     else:
-        spectrogram = mel_spectrogram(
-                y, sr=sr, n_fft=frame, hop_length=frame,
-                fmax=fmax, n_mels=n_mels).astype(np.float32).T
+        try:
+            spectrogram = mel_spectrogram(
+                    y, sr=sr, n_fft=frame, hop_length=frame,
+                    fmax=fmax, n_mels=n_mels).astype(np.float32).T
+        except:
+            print('Failed: ', wav_path)
+            spectrogram = None
 
     return spectrogram
 
 
-def wav2mel2npy(wavpath, filename, frame_length=10, verbose=False):
+def wav2mel2npy(wavpath, filename, frame_length=50, verbose=False):
     mels = wav2MelSpectrogram(wavpath, frame_length)
 
     if not filename.endswith('.npy'):
