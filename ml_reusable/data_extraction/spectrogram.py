@@ -17,7 +17,7 @@ def plot_melspectrogram(spec):
     plt.show()
 
 
-def mel_spectrogram(
+def extract_mel_spectrogram(
         y, sr, n_fft, hop_length,
         n_mels=128, fmin=0, fmax=8000, power=2, center=False):
     '''
@@ -29,14 +29,7 @@ def mel_spectrogram(
     variable. The amount of frames differs based on center is true/false.
     '''
 
-    # if len(y) < n_fft and not center:
-    #     # With center=False smaller sounds than frame size is not handled
-    #     # correctly
-    #     y_ = np.zeros(n_fft)
-    #     y_[:len(y)] = y
-    #     y = y_
-
-    # from _spectrogram
+    # from librosa  _spectrogram()
     S = np.abs(librosa.stft(
         y, n_fft=n_fft, hop_length=hop_length, center=center))**power
     # Build a Mel filter
@@ -45,7 +38,7 @@ def mel_spectrogram(
 
     mel = librosa.feature.melspectrogram(
             S=S, n_fft=n_fft, hop_length=hop_length, power=power)
-    return mel
+    return S, mel
 
 
 def wav2MelSpectrogram(
@@ -63,7 +56,7 @@ def wav2MelSpectrogram(
                 fmax=fmax, n_mels=n_mels).astype(np.float32).T
     else:
         try:
-            spectrogram = mel_spectrogram(
+            spectrogram = extract_mel_spectrogram(
                     y, sr=sr, n_fft=frame, hop_length=frame,
                     fmax=fmax, n_mels=n_mels).astype(np.float32).T
         except:
