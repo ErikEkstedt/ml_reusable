@@ -66,6 +66,23 @@ class FrameWiseDimReduction(nn.Module):
         return self.out_activation(out)
 
 
+class MLPEncoder(nn.Module):
+    def __init__(self, in_size=23, hidden=[128,128,256]):
+        super().__init__()
+
+        self.in_size = in_size
+        self.hidden = [in_size] + hidden
+        self.out_size = hidden[-1]
+        # ReLUs
+        mlps = [mlp_block(
+            in_f=self.hidden[i], out_f=self.hidden[i + 1]) \
+                    for i in range(len(self.hidden)-1)]
+        self.mlps = nn.Sequential(*mlps)
+
+    def forward(self, x):
+        return self.mlps(x)
+
+
 class CNNEncoder(nn.Module):
     '''
     Based on the reference encoder in global style tokens but without the RNN
