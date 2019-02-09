@@ -51,6 +51,7 @@ __pycache__/
 *.jar
 *.rar
 *.tar
+*.tar.bz2
 *.zip
 
 *.egg-info/
