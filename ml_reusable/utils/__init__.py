@@ -1,12 +1,12 @@
-import torch
-import json 
-import csv 
-from datetime import datetime
-from os import makedirs
-from os.path import join
+import json
+import csv
 
 
+<<<<<<< HEAD
 def read_csv(path, delimiter=','):
+=======
+def read_csv(path, delimiter):
+>>>>>>> a8a767dc28fe0aab1c2f0328c787c32fab92801f
     data = []
     with open(path, 'r') as f:
         csv_reader = csv.reader(f, delimiter=delimiter)
@@ -17,11 +17,11 @@ def read_csv(path, delimiter=','):
 
 def read_json(path):
     with open(path, 'r') as f:
-        dialogue = json.loads(f.read())
-    return dialogue
+        data = json.loads(f.read())
+    return data
 
 
-def write_json(dialogue, filename):
+def write_json(data, filename):
     with open(filename, 'w', encoding='utf-8') as jsonfile:
-        dialogue = json.dump(dialogue, jsonfile, ensure_ascii=False)
-    return dialogue
+        data = json.dump(data, jsonfile, ensure_ascii=False)
+    return data
