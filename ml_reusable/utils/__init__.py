@@ -6,10 +6,10 @@ from os import makedirs
 from os.path import join
 
 
-def read_csv(path):
+def read_csv(path, delimiter=','):
     data = []
     with open(path, 'r') as f:
-        csv_reader = csv.reader(f)
+        csv_reader = csv.reader(f, delimiter=delimiter)
         for row in csv_reader:
             data.append(row)
     return data
@@ -18,6 +18,7 @@ def read_csv(path):
 def read_json(path):
     with open(path, 'r') as f:
         dialogue = json.loads(f.read())
+    return dialogue
 
 
 def write_json(dialogue, filename):
