@@ -2,11 +2,7 @@ import json
 import csv
 
 
-<<<<<<< HEAD
 def read_csv(path, delimiter=','):
-=======
-def read_csv(path, delimiter):
->>>>>>> a8a767dc28fe0aab1c2f0328c787c32fab92801f
     data = []
     with open(path, 'r') as f:
         csv_reader = csv.reader(f, delimiter=delimiter)
